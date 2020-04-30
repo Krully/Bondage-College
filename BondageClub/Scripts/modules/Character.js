@@ -133,6 +133,16 @@ class Character {
     HasNoItem () { 
         return CharacterHasNoItem(this); 
     }
+
+    // Backward compatibility
+    get Effect () {
+        return this.Effects;
+    }
+
+    // Backward compatibility
+    get Skill () {
+        return this.Skills;
+    }
 }
 
 export default Character;
