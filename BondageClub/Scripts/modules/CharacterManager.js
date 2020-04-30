@@ -43,7 +43,7 @@ class CharacterManager {
         // Finds the full path of the CSV file to use cache
         const FullPath = Char.Index === 0 ? 
             "Screens/Character/Player/Dialog_Player" : 
-            (Override ? `Screens/${CurrentModule}/${CurrentScreen}/Dialog_${C.AccountName}` : Override) + ".csv";
+            (Override ? `Screens/${CurrentModule}/${CurrentScreen}/Dialog_${Char.AccountName}` : Override) + ".csv";
         if (CommonCSVCache[FullPath]) {
             this.BuildDialogForChar(Char, CommonCSVCache[FullPath]);
             return;
@@ -56,6 +56,69 @@ class CharacterManager {
                 CharacterBuildDialog(Char, CommonCSVCache[FullPath]);
             }
         });
+    }
+
+    LoadClothesOfChar (Char, Archetype, ForceColor) {
+        switch (Archetype) {
+            case "Maid":
+                InventoryAdd(Char, "MaidOutfit1", "Cloth", false);
+                CharacterAppearanceSetItem(Char, "Cloth", Char.Inventory[Char.Inventory.length - 1].Asset);
+                CharacterAppearanceSetColorForGroup(Char, "Default", "Cloth");
+                InventoryAdd(Char, "MaidHairband1", "Hat", false);
+                CharacterAppearanceSetItem(Char, "Hat", Char.Inventory[Char.Inventory.length - 1].Asset);
+                CharacterAppearanceSetColorForGroup(Char, "Default", "Hat");
+                InventoryAdd(Char, "MaidOutfit2", "Cloth", false);
+                const ClothesToRemove = ["ClothAccessory", "HairAccessory1", "HairAccessory2", "ClothLower"];
+                for (const ToRemove of ClothesToRemove) {
+                    InventoryRemove(Char, ToRemove);
+                }
+                Char.AllowItem = (LogQuery("LeadSorority", "Maid"));
+                break;
+            case "Mistress":
+                const ColorList = ["#333333", "#AA4444", "#AAAAAA"];
+                const Color = !ForceColor ? CommonRandomItemFromList("", ColorList) : ForceColor;
+                CharacterAppearanceSetItem(Char, "Hat", null);
+                InventoryAdd(Char, "MistressGloves", "Gloves", false);
+                InventoryWear(Char, "MistressGloves", "Gloves", Color);
+                InventoryAdd(Char, "MistressBoots", "Shoes", false);
+                InventoryWear(Char, "MistressBoots", "Shoes", Color);
+                InventoryAdd(Char, "MistressTop", "Cloth", false);
+                InventoryWear(Char, "MistressTop", "Cloth", Color);
+                InventoryAdd(Char, "MistressBottom", "ClothLower", false);
+                InventoryWear(Char, "MistressBottom", "ClothLower", Color);
+                InventoryAdd(Char, "MistressPadlock", "ItemMisc", false);
+                InventoryAdd(Char, "MistressTimerPadlock","ItemMisc", false);
+                InventoryAdd(Char, "MistressPadlockKey", "ItemMisc", false);
+                InventoryRemove(Char, "ClothAccessory");
+                InventoryRemove(Char, "HairAccessory1");
+                InventoryRemove(Char, "HairAccessory2");
+        }
+    }
+
+    LoadNPC (NPCType) {
+        const AlreadyExisting = this.Characters.find(c => c.AccountName === NPCType);
+        if (AlreadyExisting) {
+            return AlreadyExisting;
+        }
+
+        // Randomize the new character
+        CharacterReset(this.Characters.length, "Female3DCG");
+        const Char = this.Characters[this.Characters.length - 1];
+        Char.AccountName = NPCType;
+        CharacterLoadCSVDialog(Char);
+        CharacterRandomName(Char);
+        CharacterAppearanceBuildAssets(Char);
+        CharacterAppearanceFullRandom(Char);
+
+        // Sets archetype clothes
+        if (NPCType.includes("Maid")) {
+            CharacterArchetypeClothes(Char, "Maid");
+        } else if (NPCType.includes("Mistress")) {
+            CharacterArchetypeClothes(Char, "Mistress");
+        }
+
+        // Returns the new character
+        return Char;
     }
 }
 
