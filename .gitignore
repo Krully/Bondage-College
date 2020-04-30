@@ -3,3 +3,4 @@
 
 #system temp file
 .DS_Store
+node_modules
