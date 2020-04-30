@@ -1,6 +1,6 @@
 class Character {
-    constructor(CharacterID, CharacterAssetFamily) {
-        this.ID = CharacterID;
+    constructor (CharacterIndex, CharacterAssetFamily) {
+        this.Index = CharacterIndex;
 		this.Name = "";
 		this.AssetFamily = CharacterAssetFamily;
 		this.AccountName = "";
@@ -142,6 +142,11 @@ class Character {
     // Backward compatibility
     get Skill () {
         return this.Skills;
+    }
+
+    // Backward compatibility
+    get ID () {
+        return this.Index;
     }
 }
 
